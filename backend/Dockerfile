@@ -22,8 +22,15 @@ RUN python -m spacy download en_core_web_sm
 # Copy the rest of the backend code
 COPY . .
 
-# Expose port 8000
-EXPOSE 8000
+# Expose port (Render sets $PORT env var, we default to 8000)
+ENV PORT=8000
+EXPOSE ${PORT}
 
-# Run uvicorn server
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Memory Optimization for Free Tier (Render 512MB Limit)
+# 1. Force Single Worker to reduce overhead
+ENV WEB_CONCURRENCY=1
+# 2. Reduce Python Memory Fragmentation
+ENV MALLOC_ARENA_MAX=2
+
+# Run uvicorn server binding to the PORT environment variable
+CMD sh -c "uvicorn main:app --host 0.0.0.0 --port ${PORT}"
