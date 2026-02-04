@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, FileText, CheckCircle, AlertCircle, BarChart2, Star } from 'lucide-react';
+import { Upload, FileText, CheckCircle, AlertCircle, BarChart2, Star, Github, Linkedin, Globe, Mail, Code } from 'lucide-react';
 import VisualAnalytics from './components/VisualAnalytics';
 
 export default function Home() {
@@ -481,6 +481,60 @@ export default function Home() {
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-8 items-center mb-8">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden border border-slate-700">
+                  <img src="/logo.png" alt="Matchly AI Logo" className="w-full h-full object-cover opacity-80" />
+                </div>
+                <span className="text-xl font-black text-white tracking-wider">
+                  Matchly AI
+                </span>
+              </div>
+              <p className="text-sm max-w-sm">
+                Advanced resume optimization powered by semantic analysis and large language models.
+              </p>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-4">
+                Made By Developer Bharath Kumar K
+              </p>
+            </div>
+
+            <div className="flex flex-col md:items-end space-y-4">
+              <div className="flex flex-wrap gap-4">
+                <a href="mailto:bharathkumatkbk10@gmail.com" className="p-2 bg-slate-800 rounded-lg hover:bg-orange hover:text-white transition-all group" title="Email">
+                  <Mail className="w-5 h-5" />
+                </a>
+                <a href="https://www.linkedin.com/in/bharath-kumar-k-b35ba0304" target="_blank" rel="noopener noreferrer" className="p-2 bg-slate-800 rounded-lg hover:bg-[#0077b5] hover:text-white transition-all group" title="LinkedIn">
+                  <Linkedin className="w-5 h-5" />
+                </a>
+                <a href="https://github.com/Bharath-Kumar-K-0930" target="_blank" rel="noopener noreferrer" className="p-2 bg-slate-800 rounded-lg hover:bg-black hover:text-white transition-all group" title="GitHub Profile">
+                  <Github className="w-5 h-5" />
+                </a>
+                <a href="https://bharath-kumar-k-0930.github.io/My_Portfolio_website/" target="_blank" rel="noopener noreferrer" className="p-2 bg-slate-800 rounded-lg hover:bg-cyan hover:text-white transition-all group" title="Portfolio">
+                  <Globe className="w-5 h-5" />
+                </a>
+                <a href="https://leetcode.com/u/Bharath_Kumar_K_91/" target="_blank" rel="noopener noreferrer" className="p-2 bg-slate-800 rounded-lg hover:bg-[#FFA116] hover:text-white transition-all group" title="LeetCode">
+                  <Code className="w-5 h-5" />
+                </a>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <a href="https://github.com/Bharath-Kumar-K-0930/Matchly-AI.git" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-cyan transition-colors">
+                  <Github className="w-4 h-4" />
+                  <span>Source Code</span>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs">
+            <p>&copy; {new Date().getFullYear()} Matchly AI. All rights reserved.</p>
+            <p className="mt-2 md:mt-0">Built with Next.js, FastAPI & Python</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
