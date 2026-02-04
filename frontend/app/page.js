@@ -476,7 +476,7 @@ export default function Home() {
 
             {/* Visual Analytics */}
             <div className="mt-8">
-              <VisualAnalytics breakdown={result.analysis.breakdown} />
+              <VisualAnalytics breakdown={result.analysis.breakdown} overallScore={result.analysis.overall_score} />
             </div>
           </div>
         )}
