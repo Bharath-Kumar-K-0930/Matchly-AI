@@ -97,10 +97,28 @@ export default function Home() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              "name": "Matchly AI",
+              "applicationCategory": "BusinessApplication",
+              "operatingSystem": "Web",
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+              },
+              "description": "AI-powered resume parser and job description matcher that helps job seekers optimize their resumes for ATS."
+            })
+          }}
+        />
         {/* Hero */}
         <div className="text-center mb-16 space-y-4">
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight">
-            Optimize Your Resume with <br />
+            Matchly AI: Optimize Your Resume with <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange to-cyan">
               AI-Powered Precision
             </span>
