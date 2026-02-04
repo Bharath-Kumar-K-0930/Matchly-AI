@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+:root {
+  --background: #FAFAFB;
+  --foreground: #1E293B;
+  --cyan: #2BCFCE;
+  --orange: #EC4D25;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular;
+
+  /* Premium Design Tokens */
+  --color-snow: #FAFAFB;
+  --color-silver: #E2E8F0;
+  --color-slate: #64748B;
+  --color-cyan: #2BCFCE;
+  --color-orange: #EC4D25;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0F172A;
+    --foreground: #F8FAFC;
+  }
+}
+
+/* 
+   ULTRA-SMOOTH GLOBAL TRANSITION SYSTEM 
+   Using a custom Quart-Out easing for a buttery-smooth feel 
+*/
+* {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  transition-duration: 400ms;
+}
+
+/* Ensure specific interactive states are also covered */
+*:hover {
+  transition-duration: 500ms;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--silver);
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cyan);
+}
+
+/* Shimmer Animation for Buttons */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Floating Animation for Cards */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Fade In Up for items */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal-item {
+  animation: fadeInUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
