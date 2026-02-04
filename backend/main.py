@@ -12,7 +12,7 @@ from utils.advanced_scorer import advanced_match
 import json
 from typing import Optional
 
-app = FastAPI(title="IntelliHire-AI Resume Parser")
+app = FastAPI(title="Matchly AI Resume Parser")
 
 # CORS Configuration
 origins = [

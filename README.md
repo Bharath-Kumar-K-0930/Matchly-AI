@@ -1,4 +1,4 @@
-# IntelliHire-AI: Advanced IT Resume Analyzer
+# Matchly AI: Advanced IT Resume Analyzer
 
 <div align="center">
   <img src="https://img.shields.io/badge/Status-Beta_v2.0-cyan?style=for-the-badge" alt="Status" />
@@ -9,7 +9,7 @@
 
 <br />
 
-**IntelliHire-AI** is a next-generation resume parsing and scoring engine specialized for the IT industry. Unlike generic parsers, it understands the nuance of technical stacks, mapping relationships between technologies (e.g., treating `Django` and `FastAPI` as related backend frameworks) and detecting deep security/architectural capabilities.
+**Matchly AI** is a next-generation resume parsing and scoring engine specialized for the IT industry. Unlike generic parsers, it understands the nuance of technical stacks, mapping relationships between technologies (e.g., treating `Django` and `FastAPI` as related backend frameworks) and detecting deep security/architectural capabilities.
 
 ---
 
