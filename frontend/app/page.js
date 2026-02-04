@@ -499,7 +499,7 @@ export default function Home() {
                 Advanced resume optimization powered by semantic analysis and large language models.
               </p>
               <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-4">
-                Made By Developer Bharath Kumar K
+                Made By Developer <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange to-cyan hover:tracking-widest transition-all cursor-default">Bharath Kumar K</span>
               </p>
             </div>
 
