@@ -7,21 +7,23 @@ import {
 
 export default function VisualAnalytics({ breakdown, overallScore }) {
     // 1. Prepare Data for Radial Bar Chart
+    // Mapping Backend Keys to Visual Categories:
+    // Skills (40), Experience (20), Education (10), Quality (10), Bonus (20) - Total 100
     const radialData = [
-        { name: 'ATS Scan', score: (breakdown.ats_score / 10) * 100, xVal: breakdown.ats_score, full: 10, fill: '#64748b' }, // Slate
-        { name: 'Tech Stack', score: (breakdown.stack_score / 10) * 100, xVal: breakdown.stack_score, full: 10, fill: '#eab308' }, // Yellow
-        { name: 'Experience', score: (breakdown.experience_score / 20) * 100, xVal: breakdown.experience_score, full: 20, fill: '#06b6d4' }, // Cyan
-        { name: 'Impact', score: (breakdown.responsibility_score / 25) * 100, xVal: breakdown.responsibility_score, full: 25, fill: '#a855f7' }, // Purple
-        { name: 'Skills', score: breakdown.skill_score && breakdown.skill_score > 0 ? (breakdown.skill_score / 35) * 100 : 0, xVal: breakdown.skill_score, full: 35, fill: '#f97316' }, // Orange
+        { name: 'ATS Scan', score: (breakdown.quality_score / 10) * 100, xVal: breakdown.quality_score, full: 10, fill: '#64748b' }, // Quality -> Slate
+        { name: 'Bonus/Stack', score: (breakdown.bonus_score / 20) * 100, xVal: breakdown.bonus_score, full: 20, fill: '#eab308' },  // Bonus -> Yellow
+        { name: 'Experience', score: (breakdown.experience_score / 20) * 100, xVal: breakdown.experience_score, full: 20, fill: '#06b6d4' }, // Exp -> Cyan
+        { name: 'Credentials', score: (breakdown.education_score / 10) * 100, xVal: breakdown.education_score, full: 10, fill: '#a855f7' }, // Edu -> Purple
+        { name: 'Skills', score: (breakdown.skill_score / 40) * 100, xVal: breakdown.skill_score, full: 40, fill: '#f97316' },   // Skills -> Orange
     ];
 
     // 2. Prepare Data for Radar Chart
     const radarData = [
-        { subject: 'Skills', A: Math.min(100, (breakdown.skill_score / 35) * 100), full: 100 },
-        { subject: 'Impact', A: Math.min(100, (breakdown.responsibility_score / 25) * 100), full: 100 },
+        { subject: 'Skills', A: Math.min(100, (breakdown.skill_score / 40) * 100), full: 100 },
+        { subject: 'Creds', A: Math.min(100, (breakdown.education_score / 10) * 100), full: 100 },
         { subject: 'Depth', A: Math.min(100, (breakdown.experience_score / 20) * 100), full: 100 },
-        { subject: 'Stack', A: Math.min(100, (breakdown.stack_score / 10) * 100), full: 100 },
-        { subject: 'ATS', A: Math.min(100, (breakdown.ats_score / 10) * 100), full: 100 },
+        { subject: 'Bonus', A: Math.min(100, (breakdown.bonus_score / 20) * 100), full: 100 },
+        { subject: 'ATS', A: Math.min(100, (breakdown.quality_score / 10) * 100), full: 100 },
     ];
 
     const CustomTooltip = ({ active, payload }) => {
