@@ -31,21 +31,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+ALLOWED_EXTENSIONS = {'.pdf', '.docx', '.txt'}
 MAX_FILE_SIZE = 5 * 1024 * 1024 # 5MB
 
-async def validate_pdf(file: UploadFile):
-    if not file.filename.lower().endswith('.pdf'):
-        raise HTTPException(status_code=400, detail=f"File {file.filename} must be a PDF.")
+async def validate_file(file: UploadFile):
+    ext = "." + file.filename.split('.')[-1].lower() if '.' in file.filename else ""
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(status_code=400, detail=f"File {file.filename} has unsupported extension. Allowed: PDF, DOCX, TXT")
     
-    # Check Magic Number (Header)
+    # Basic Magic Number Checks
     header = await file.read(4)
-    await file.seek(0) # Reset cursor
-    if header != b'%PDF':
+    await file.seek(0)
+    
+    if ext == '.pdf' and header != b'%PDF':
          raise HTTPException(status_code=400, detail=f"File {file.filename} does not appear to be a valid PDF.")
-         
-    # Check Size (Approximate via content-length header if available, else read check)
-    # Note: UploadFile might be spooled. 
-    # For strict checking:
+    
+    # Docx usually starts with PK (zip)
+    if ext == '.docx' and header[:2] != b'PK':
+         raise HTTPException(status_code=400, detail=f"File {file.filename} does not appear to be a valid DOCX.")
+
+    # Size Check
     content = await file.read()
     await file.seek(0)
     if len(content) > MAX_FILE_SIZE:
@@ -59,13 +64,13 @@ async def analyze_resume(
 ):
     try:
         # Security: Validate Resume
-        await validate_pdf(resume)
+        await validate_file(resume)
         
         # 1. Parse Resume
         resume_content = await resume.read()
         resume_text = extract_text(resume_content, resume.filename)
         if not resume_text:
-             raise HTTPException(status_code=400, detail="Could not extract text from Resume PDF.")
+             raise HTTPException(status_code=400, detail="Could not extract text from Resume file.")
 
         # 2. Get Job Description Text
         jd_text = ""
@@ -73,14 +78,14 @@ async def analyze_resume(
         
         if job_description_file:
             # Security: Validate JD File
-            await validate_pdf(job_description_file)
+            await validate_file(job_description_file)
             
             jd_content = await job_description_file.read()
             jd_text = extract_text(jd_content, job_description_file.filename)
             jd_source = job_description_file.filename
             
             if not jd_text:
-                 raise HTTPException(status_code=400, detail="Could not extract text from Job Description PDF.")
+                 raise HTTPException(status_code=400, detail="Could not extract text from Job Description file.")
                  
         elif job_description_text:
             if len(job_description_text) > 100_000: # 100k char limit for text
@@ -88,7 +93,7 @@ async def analyze_resume(
             jd_text = job_description_text
             jd_source = "Text Input"
         else:
-            raise HTTPException(status_code=400, detail="Please provide either a Job Description file (PDF) or text.")
+            raise HTTPException(status_code=400, detail="Please provide either a Job Description file or text.")
 
         # 3. Extract Sections from Resume (Legacy / Display)
         sections = extract_sections(resume_text)

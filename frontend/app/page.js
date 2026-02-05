@@ -18,9 +18,15 @@ export default function Home() {
   const handleFileChange = (e, type) => {
     if (e.target.files && e.target.files[0]) {
       const selected = e.target.files[0];
-      if (selected.type !== "application/pdf") {
-        return alert("Only PDF files are allowed.");
+      const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+
+      // Basic check - rely on backend for robust validation if needed, but allow these MIME types
+      // Note: Windows sometimes has weird MIME types, so we can also check extensions
+      const ext = selected.name.split('.').pop().toLowerCase();
+      if (!['pdf', 'docx', 'txt'].includes(ext)) {
+        return alert("Only PDF, DOCX, and TXT files are allowed.");
       }
+
       if (type === 'resume') setFile(selected);
       if (type === 'jd') setJdFile(selected);
     }
@@ -33,8 +39,9 @@ export default function Home() {
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const selected = e.dataTransfer.files[0];
-      if (selected.type !== "application/pdf") {
-        return alert("Only PDF files are allowed.");
+      const ext = selected.name.split('.').pop().toLowerCase();
+      if (!['pdf', 'docx', 'txt'].includes(ext)) {
+        return alert("Only PDF, DOCX, and TXT files are allowed.");
       }
       if (type === 'resume') setFile(selected);
       if (type === 'jd') setJdFile(selected);
@@ -42,8 +49,8 @@ export default function Home() {
   };
 
   const handleAnalyze = async () => {
-    if (!file) return alert("Please upload a resume (PDF).");
-    if (jdType === 'pdf' && !jdFile) return alert("Please upload a Job Description PDF.");
+    if (!file) return alert("Please upload a resume (PDF/DOCX/TXT).");
+    if (jdType === 'pdf' && !jdFile) return alert("Please upload a Job Description.");
     if (jdType === 'text' && !jdText.trim()) return alert("Please paste the Job Description text.");
 
     setLoading(true);
@@ -143,7 +150,7 @@ export default function Home() {
                 <FileText className="w-5 h-5 text-orange" />
                 1. Upload Resume
               </h2>
-              <span className="text-xs text-white font-bold bg-orange px-2 py-1 rounded shadow-sm">PDF ONLY</span>
+              <span className="text-xs text-white font-bold bg-orange px-2 py-1 rounded shadow-sm">PDF, DOCX, TXT</span>
             </div>
 
             <div
@@ -160,7 +167,7 @@ export default function Home() {
                 type="file"
                 id="resume-upload"
                 className="hidden"
-                accept=".pdf"
+                accept=".pdf,.docx,.doc,.txt"
                 onChange={(e) => handleFileChange(e, 'resume')}
               />
 
@@ -187,7 +194,7 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="font-bold text-slate-700 text-lg">Drop your resume here</p>
-                    <p className="text-sm text-slate-500">Accepts high-quality PDF files</p>
+                    <p className="text-sm text-slate-500">Supported: PDF, DOCX, TXT</p>
                   </div>
                 </label>
               )}
@@ -207,7 +214,7 @@ export default function Home() {
                   onClick={() => setJdType('pdf')}
                   className={`px-4 py-1.5 text-xs font-black uppercase tracking-tighter rounded-lg transition-all ${jdType === 'pdf' ? 'bg-cyan text-white shadow-lg' : 'text-slate-400 hover:text-cyan hover:bg-cyan/5'}`}
                 >
-                  Upload PDF
+                  Upload File
                 </button>
                 <button
                   onClick={() => setJdType('text')}
@@ -233,7 +240,7 @@ export default function Home() {
                   type="file"
                   id="jd-upload"
                   className="hidden"
-                  accept=".pdf"
+                  accept=".pdf,.docx,.doc,.txt"
                   onChange={(e) => handleFileChange(e, 'jd')}
                 />
 
@@ -259,8 +266,8 @@ export default function Home() {
                       <Upload className="w-10 h-10" />
                     </div>
                     <div>
-                      <p className="font-bold text-slate-700 text-lg">Drop JD PDF here</p>
-                      <p className="text-sm text-slate-500">Directly analyze job requirements</p>
+                      <p className="font-bold text-slate-700 text-lg">Drop JD file here</p>
+                      <p className="text-sm text-slate-500">Supported: PDF, DOCX, TXT</p>
                     </div>
                   </label>
                 )}
