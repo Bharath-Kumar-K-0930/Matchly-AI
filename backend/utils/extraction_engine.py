@@ -192,10 +192,23 @@ class ResumeAgent:
                     ))
                     all_it_techs.append(normalized)
                 
-        # Experience Year Calculation
-        years_found = re.findall(r'(\d+)\+?\s*years?', resume_lower)
-        valid_years = [int(y) for y in years_found if int(y) < 35] # Filter out "2020 years" typos
-        total_years = max(valid_years) if valid_years else 0.0
+        # Experience Year Calculation (Improved)
+        # Look for explicit patterns first "5+ years", "5 years experience", "Experience: 5 years"
+        explicit_years = re.findall(r'(\d+(?:\.\d+)?)\+?\s*(?:year|yr)s?', resume_lower)
+        if explicit_years:
+             valid_years = [float(y) for y in explicit_years if float(y) < 35] 
+             total_years = max(valid_years) if valid_years else 0.0
+        else:
+             # Fallback: Count gaps between dates? Too complex for regex.
+             # Assume entry level if no numbers found, or mid-level if text is long.
+             # But safe default is 0.0
+             total_years = 0.0
+             
+        # Fallback: If 0 years found, but "Senior" or "Lead" in text -> Mock 5.0
+        if total_years == 0 and ("senior" in resume_lower or "lead" in resume_lower or "manager" in resume_lower):
+            total_years = 5.0
+        elif total_years == 0 and ("mid-level" in resume_lower or "intermediate" in resume_lower):
+            total_years = 3.0
 
         return ParsedResume(
             technical_skills_with_evidence=skills_evidence,
