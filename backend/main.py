@@ -19,6 +19,8 @@ origins = [
     "http://localhost:3000",
     "http://localhost:3001",
     "http://127.0.0.1:3000",
+    "https://matchly-ai.vercel.app",
+    "https://matchly-ai.onrender.com"
 ]
 
 app.add_middleware(
