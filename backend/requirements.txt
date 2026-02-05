@@ -6,6 +6,6 @@ pymupdf
 python-docx
 spacy
 nltk
-sentence-transformers
+scikit-learn
 numpy
 pandas

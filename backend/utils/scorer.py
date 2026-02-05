@@ -4,19 +4,25 @@ from collections import Counter
 from utils.normalizer import normalize_skill
 from utils.it_taxonomy_data import IT_TAXONOMY
 
-# Try importing semantic libraries
+# Lightweight Semantic Matching (TF-IDF + Spacy) for Memory Optimization
 try:
-    from sentence_transformers import SentenceTransformer, util
-    model = SentenceTransformer('all-MiniLM-L6-v2') 
+    import spacy
+    import numpy as np
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+    
+    # Load small spacy model for lemma/stopword handling (Lightweight)
+    nlp = spacy.load("en_core_web_sm") 
     SEMANTIC_AVAILABLE = True
-except ImportError:
-    model = None
+    print("Semantic Engine: Loaded lightweight TF-IDF + Spacy en_core_web_sm.")
+except ImportError as e:
+    nlp = None
     SEMANTIC_AVAILABLE = False
-    print("Warning: sentence-transformers not found via import. Semantic features disabled.")
+    print(f"Warning: Semantic dependencies missing: {e}")
 except Exception as e:
-    model = None
+    nlp = None
     SEMANTIC_AVAILABLE = False
-    print(f"Warning: Could not load SentenceTransformer: {e}")
+    print(f"Warning: Could not load Semantic Engine: {e}")
 
 COMMON_SKILLS_DB = [
     "python", "java", "javascript", "typescript", "react", "angular", "vue", "node.js", 
@@ -90,20 +96,31 @@ def parse_job_description(jd_text):
     }
 
 def calculate_semantic_similarity(text1, text2):
-    if not SEMANTIC_AVAILABLE or not model:
+    if not SEMANTIC_AVAILABLE or not nlp:
         return 0.5 
     
-    # Truncate for speed
-    e1 = model.encode(text1[:1000], convert_to_tensor=True)
-    e2 = model.encode(text2[:1000], convert_to_tensor=True)
-    return float(util.cos_sim(e1, e2)[0][0])
+    # 1. Preprocess (Lemmatize + Remove Stopwords)
+    def clean(text):
+        doc = nlp(text[:2000].lower()) # Limit to 2000 chars for speed
+        return " ".join([token.lemma_ for token in doc if not token.is_stop and not token.is_punct])
+
+    t1_clean = clean(text1)
+    t2_clean = clean(text2)
+    
+    # 2. TF-IDF Similarity
+    vectorizer = TfidfVectorizer()
+    try:
+        tfidf_matrix = vectorizer.fit_transform([t1_clean, t2_clean])
+        return float(cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0])
+    except ValueError:
+        return 0.0 # Handle empty vocabulary
 
 def semantic_match(jd_items, resume_items, threshold=0.65):
     """
     Performs semantic matching between a list of JD requirements and Resume items.
     Returns a structured list of match results with status and confidence.
     """
-    if not SEMANTIC_AVAILABLE or not model:
+    if not SEMANTIC_AVAILABLE or not nlp:
         # Fallback for when model is not loaded
         return [{
             "jd_requirement": item,
@@ -120,34 +137,44 @@ def semantic_match(jd_items, resume_items, threshold=0.65):
             "status": "missing"
         } for item in jd_items]
 
-    # Normalize resume items for better semantic alignment
+    # Normalize items
     normalized_resume_items = [normalize_skill(r) for r in resume_items]
-
-    # Batch encode
-    jd_embeddings = model.encode(jd_items, convert_to_tensor=True)
-    resume_embeddings = model.encode(normalized_resume_items, convert_to_tensor=True)
+    
+    # Pre-compute spacy docs for resume items (Small en_core_web_sm doesn't have vectors but we can fuzzy match or just trust strict match + taxonomy)
+    # Using 'en_core_web_sm', .similarity() is weak. We rely more heavily on Taxonomy + Strict Match.
+    # To recover some "Fuzzy" capability, we use basic Jaccard or Levenshtein via Spacy tokens if needed
+    # But for now, we rely on the Taxonomy Loop which is robust.
+    
+    # Note: Removing heavy SentenceTransformer completely. 
+    # relying on the Exact Match + Taxonomy Boost logic which was already the core driver.
 
     results = []
     
     for i, jd_item in enumerate(jd_items):
-        best_final_score = -1.0 # Allow negatives if embeddings are weird, but usually 0-1
+        best_final_score = -1.0
         best_match_text = None
         
         norm_jd = normalize_skill(jd_item)
 
         # Iterate all resume items to find true best match after boost
         for j, resume_item in enumerate(normalized_resume_items):
-            # Calculate raw similarity
-            raw_score = float(util.cos_sim(jd_embeddings[i], resume_embeddings[j])[0][0])
              
             norm_resume = normalize_skill(resume_item)
-             
-            current_score = raw_score
+            
+            # Base Score: 0.0 (Since we dropped BERT)
+            # We ONLY rely on Exact + Taxonomy Boost now. 
+            # This is safer for free tier than trying to run 400MB tensors.
+            current_score = 0.0 
             
             # 1. Exact Normal Match
             if norm_jd == norm_resume:
                 current_score = 1.0
-            else:
+            
+            # 1b. Substring Match (Cheap Semantic)
+            elif norm_jd in norm_resume or norm_resume in norm_jd:
+                current_score = 0.75 # Partial word match e.g. "aws" in "aws cloud"
+            
+            # 2. Category Cluster Boost (The "Secret Sauce")
                 # 2. Category Cluster Boost
                 for cat, skills in IT_TAXONOMY.items():
                     if norm_jd in skills and norm_resume in skills:
