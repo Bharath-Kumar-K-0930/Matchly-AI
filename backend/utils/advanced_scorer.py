@@ -138,6 +138,7 @@ def advanced_match(resume: ParsedResume, jd: ParsedJobDescription) -> MatchScore
     
     matched_set = set()
     missing_set = set()
+    gap_seen_set = set()
     
     for item in detailed_report:
         # Skip generic responsibility items for skill lists
@@ -150,28 +151,34 @@ def advanced_match(resume: ParsedResume, jd: ParsedJobDescription) -> MatchScore
             if skill_key not in missing_set:
                 missing_skills_list.append(item.job_requirement)
                 missing_set.add(skill_key)
+            
+            if skill_key not in gap_seen_set:
+                gap_analysis.append(SkillGapAnalysis(
+                    skill=item.job_requirement,
+                    severity="high",
+                    reason="No technical evidence found in experience or projects.",
+                    how_to_improve=f"Complete a project or certification involving {item.job_requirement} to demonstrate capability."
+                ))
+                gap_seen_set.add(skill_key)
                 
-            gap_analysis.append(SkillGapAnalysis(
-                skill=item.job_requirement,
-                severity="high",
-                reason="No technical evidence found in experience or projects.",
-                how_to_improve=f"Complete a project or certification involving {item.job_requirement} to demonstrate capability."
-            ))
         elif item.match_status == "strong":
             if skill_key not in matched_set:
                 matched_skills_list.append(item.job_requirement)
                 matched_set.add(skill_key)
+                
         elif item.match_status == "partial":
             if skill_key not in matched_set:
                 matched_skills_list.append(f"{item.job_requirement} (Partial)")
                 matched_set.add(skill_key)
             
-            gap_analysis.append(SkillGapAnalysis(
-                skill=item.job_requirement,
-                severity="medium",
-                reason=f"Found limited evidence or related technology ({item.resume_evidence}).",
-                how_to_improve=f"Deepen expertise in {item.job_requirement} by implementing more complex features."
-            ))
+            if skill_key not in gap_seen_set:
+                gap_analysis.append(SkillGapAnalysis(
+                    skill=item.job_requirement,
+                    severity="medium",
+                    reason=f"Found limited evidence or related technology ({item.resume_evidence}).",
+                    how_to_improve=f"Deepen expertise in {item.job_requirement} by implementing more complex features."
+                ))
+                gap_seen_set.add(skill_key)
 
     return MatchScore(
         overall_score=int(final_score),
