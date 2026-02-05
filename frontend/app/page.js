@@ -89,11 +89,21 @@ export default function Home() {
             </span>
           </div>
           <div className="flex items-center space-x-6">
-            <a href="#" className="text-sm text-slate-400 hover:text-orange font-bold uppercase tracking-widest transition-all">Documentation</a>
-            <div className="h-4 w-[1px] bg-silver"></div>
-            <span className="text-sm text-slate-500 font-black uppercase tracking-widest px-3 py-1 bg-silver/10 rounded-full border border-silver/20">v2.0 Beta</span>
+            import {generatePDF} from '../utils/generatePDF';
+
+            // ... (in Home component)
+
+            <div className="flex items-center space-x-6">
+              <button
+                onClick={() => result ? generatePDF(result) : alert("Please complete an analysis first to download the report.")}
+                className="text-sm text-slate-400 hover:text-orange font-bold uppercase tracking-widest transition-all hover:scale-105"
+              >
+                Download Report
+              </button>
+              <div className="h-4 w-[1px] bg-silver"></div>
+              <span className="text-sm text-slate-500 font-black uppercase tracking-widest px-3 py-1 bg-silver/10 rounded-full border border-silver/20">v2.0 Beta</span>
+            </div>
           </div>
-        </div>
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
